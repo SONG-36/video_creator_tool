@@ -74,7 +74,7 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         assert saved_shot.production_tasks[0].camera == "Slow push-in"
         assert saved_shot.production_tasks[0].motion == "Steam expands across the surface"
         assert saved_shot.production_tasks[0].lighting == "Soft daylight with clean highlights"
-        assert saved_shot.assets[0].status == "required"
+        assert saved_shot.assets[0].status == "pending"
         assert saved_shot.assets[0].role == "identity"
         assert saved_shot.assets[0].reference_tag == "@Image1"
         assert saved_shot.production_tasks[0].assets[0].file_path.endswith("steam-cleaner.png")

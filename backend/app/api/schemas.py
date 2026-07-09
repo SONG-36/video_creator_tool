@@ -135,3 +135,44 @@ class ProductionPlanResponse(ApiResponse):
     """Response envelope carrying an AI production plan."""
 
     data: dict[str, ProductionPlanData]
+
+
+class UpdateAssetStatusRequest(BaseModel):
+    """Payload for updating an asset status."""
+
+    status: str
+
+
+class AssetData(BaseModel):
+    """Serialized asset payload."""
+
+    asset_id: str
+    shot_id: str
+    production_task_id: Optional[str]
+    asset_type: str
+    role: str
+    reference_tag: str
+    requirement_note: str
+    file_path: str
+    file_name: Optional[str]
+    file_size: Optional[int]
+    status: str
+
+
+class AssetResponse(ApiResponse):
+    """Response envelope carrying one asset payload."""
+
+    data: dict[str, AssetData]
+
+
+class AssetListData(BaseModel):
+    """Serialized list payload for production task assets."""
+
+    production_task_id: str
+    assets: list[AssetData]
+
+
+class AssetListResponse(ApiResponse):
+    """Response envelope carrying a production task asset list."""
+
+    data: dict[str, AssetListData]

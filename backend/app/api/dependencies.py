@@ -1,8 +1,11 @@
 """API dependency providers."""
 
+from pathlib import Path
+
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.db.session import get_db_session
 from app.providers.director_provider import OpenAIDirectorProvider
 from app.providers.skill_knowledge import FileSystemSkillKnowledgeAdapter
@@ -14,6 +17,7 @@ from app.repositories.script import ScriptRepository
 from app.repositories.shot import ShotRepository
 from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
+from app.services.asset import AssetService
 from app.services.director import AIDirectorService
 from app.services.production_type import ProductionTypeService
 from app.services.review import ShotReviewService
@@ -29,6 +33,17 @@ def get_script_service(session: Session = Depends(get_db_session)) -> ScriptServ
     return ScriptService(
         project_repository=project_repository,
         script_repository=script_repository,
+    )
+
+
+def get_asset_service(session: Session = Depends(get_db_session)) -> AssetService:
+    """Build the asset service from repository dependencies."""
+
+    settings = get_settings()
+    return AssetService(
+        asset_repository=AssetRepository(session),
+        production_repository=ProductionRepository(session),
+        storage_dir=Path(settings.asset_storage_dir),
     )
 
 

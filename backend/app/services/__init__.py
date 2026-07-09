@@ -1,5 +1,13 @@
 """Service layer exports."""
 
+from app.services.asset import (
+    ALLOWED_ASSET_STATUSES,
+    AssetNotFoundError,
+    AssetService,
+    AssetStatusError,
+    AssetUploadError,
+    ProductionTaskAssetError,
+)
 from app.services.director import (
     AIDirectorService,
     InvalidProductionPlanRequestError,
@@ -13,10 +21,16 @@ from app.services.script import ProjectNotFoundError, ScriptNotFoundError, Scrip
 
 __all__ = [
     "AIDirectorService",
+    "ALLOWED_ASSET_STATUSES",
+    "AssetNotFoundError",
+    "AssetService",
+    "AssetStatusError",
+    "AssetUploadError",
     "InvalidProductionPlanRequestError",
     "InvalidShotReviewTransitionError",
     "InvalidProductionTypeSelectionError",
     "ProjectNotFoundError",
+    "ProductionTaskAssetError",
     "ProductionPlanGenerationFailedError",
     "ProductionPlanNotFoundError",
     "ProductionTypeService",

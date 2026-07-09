@@ -24,8 +24,8 @@ class Asset(Base, IdMixin):
     role: Mapped[str] = mapped_column(String(100), default="")
     reference_tag: Mapped[str] = mapped_column(String(50), default="")
     requirement_note: Mapped[str] = mapped_column(Text, default="")
-    file_path: Mapped[str] = mapped_column(String(500))
-    status: Mapped[str] = mapped_column(String(50), default="required")
+    file_path: Mapped[str] = mapped_column(String(500), default="")
+    status: Mapped[str] = mapped_column(String(50), default="pending")
 
     shot: Mapped["Shot"] = relationship(back_populates="assets")
     production_task: Mapped[Optional["ProductionTask"]] = relationship(back_populates="assets")

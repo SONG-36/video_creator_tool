@@ -69,7 +69,7 @@ class AIDirectorService:
                     reference_tag=requirement.reference_tag,
                     requirement_note=requirement.requirement_note,
                     file_path="",
-                    status="required",
+                    status="pending",
                 )
             )
 
