@@ -39,3 +39,16 @@ class ScriptResponse(ApiResponse):
     """Response envelope carrying a script payload."""
 
     data: dict[str, ScriptData]
+
+
+class StoryboardGenerateData(BaseModel):
+    """Payload returned after storyboard generation."""
+
+    storyboard_id: str
+    shot_count: int
+
+
+class StoryboardGenerateResponse(ApiResponse):
+    """Response envelope carrying generated storyboard metadata."""
+
+    data: dict[str, StoryboardGenerateData]
