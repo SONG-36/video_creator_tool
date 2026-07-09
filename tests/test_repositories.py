@@ -95,20 +95,28 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
         action="Pan across surface",
         camera="Wide pan",
     )
-    asset = asset_repository.create(
-        shot_id=shot.shot_id,
-        asset_type="reference_image",
-        file_path="storage/assets/counter.png",
-    )
     task = production_repository.create(
         shot_id=shot.shot_id,
         prompt="Clean the counter",
         negative_prompt="low quality",
+        camera="Slow dolly-in",
+        motion="Foam spreads from left to right",
+        lighting="Bright commercial kitchen light",
+    )
+    asset = asset_repository.create(
+        shot_id=shot.shot_id,
+        production_task_id=task.task_id,
+        asset_type="reference_image",
+        role="first_frame",
+        reference_tag="@Image1",
+        requirement_note="Use as the opening frame reference",
+        file_path="storage/assets/counter.png",
     )
 
     shots = shot_repository.list_by_storyboard_id(storyboard.storyboard_id)
     assets = asset_repository.list_by_shot_id(shot.shot_id)
     tasks = production_repository.list_by_shot_id(shot.shot_id)
+    task_assets = asset_repository.list_by_production_task_id(task.task_id)
     updated_shot = shot_repository.update(shot.shot_id, production_type="ai_generate")
     updated_asset = asset_repository.update(asset.asset_id, status="uploaded")
     updated_task = production_repository.update(task.task_id, status="ready")
@@ -117,8 +125,12 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
     assert shots[0].scene == "Kitchen counter"
     assert len(assets) == 1
     assert assets[0].file_path.endswith("counter.png")
+    assert assets[0].reference_tag == "@Image1"
     assert len(tasks) == 1
     assert tasks[0].model == "seedance"
+    assert tasks[0].camera == "Slow dolly-in"
+    assert len(task_assets) == 1
+    assert task_assets[0].role == "first_frame"
     assert updated_shot is not None
     assert updated_shot.production_type == "ai_generate"
     assert updated_asset is not None

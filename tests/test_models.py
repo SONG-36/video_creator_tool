@@ -34,9 +34,18 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
             camera="Close-up push-in",
         )
         review = ShotReview(result="approved", comment="Looks good", reviewer="reviewer_a")
-        task = ProductionTask(prompt="Clean the stain with steam.", negative_prompt="blur")
+        task = ProductionTask(
+            prompt="Clean the stain with steam.",
+            negative_prompt="blur",
+            camera="Slow push-in",
+            motion="Steam expands across the surface",
+            lighting="Soft daylight with clean highlights",
+        )
         asset = Asset(
             asset_type="product_image",
+            role="identity",
+            reference_tag="@Image1",
+            requirement_note="Use as canonical product reference",
             file_path="storage/assets/steam-cleaner.png",
         )
 
@@ -46,6 +55,7 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         shot.reviews.append(review)
         shot.production_tasks.append(task)
         shot.assets.append(asset)
+        task.assets.append(asset)
 
         session.add(project)
         session.commit()
@@ -61,7 +71,12 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
 
         assert saved_shot.reviews[0].result == "approved"
         assert saved_shot.production_tasks[0].model == "seedance"
+        assert saved_shot.production_tasks[0].camera == "Slow push-in"
+        assert saved_shot.production_tasks[0].motion == "Steam expands across the surface"
+        assert saved_shot.production_tasks[0].lighting == "Soft daylight with clean highlights"
         assert saved_shot.assets[0].status == "required"
+        assert saved_shot.assets[0].role == "identity"
+        assert saved_shot.assets[0].reference_tag == "@Image1"
         assert saved_shot.production_tasks[0].assets[0].file_path.endswith("steam-cleaner.png")
 
 
