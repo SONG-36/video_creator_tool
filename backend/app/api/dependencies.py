@@ -10,6 +10,7 @@ from app.repositories.script import ScriptRepository
 from app.repositories.shot import ShotRepository
 from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
+from app.services.production_type import ProductionTypeService
 from app.services.review import ShotReviewService
 from app.services.script import ScriptService
 from app.services.storyboard import StoryboardService
@@ -52,4 +53,12 @@ def get_shot_review_service(session: Session = Depends(get_db_session)) -> ShotR
     return ShotReviewService(
         shot_repository=ShotRepository(session),
         shot_review_repository=ShotReviewRepository(session),
+    )
+
+
+def get_production_type_service(session: Session = Depends(get_db_session)) -> ProductionTypeService:
+    """Build the production type service from repository dependencies."""
+
+    return ProductionTypeService(
+        shot_repository=ShotRepository(session),
     )

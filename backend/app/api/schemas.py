@@ -80,3 +80,23 @@ class ShotReviewResponse(ApiResponse):
     """Response envelope carrying a shot review payload."""
 
     data: dict[str, ShotReviewData]
+
+
+class SelectProductionTypeRequest(BaseModel):
+    """Payload for selecting a shot production type."""
+
+    production_type: str
+
+
+class ShotProductionTypeData(BaseModel):
+    """Serialized shot production type payload."""
+
+    shot_id: str
+    production_type: str
+    review_status: str
+
+
+class ShotProductionTypeResponse(ApiResponse):
+    """Response envelope carrying a shot production selection."""
+
+    data: dict[str, ShotProductionTypeData]
