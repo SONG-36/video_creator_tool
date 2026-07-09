@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.db.session import get_db_session
 from app.providers.director_provider import OpenAIDirectorProvider
+from app.providers.seedance_provider import SeedanceProvider
 from app.providers.skill_knowledge import FileSystemSkillKnowledgeAdapter
 from app.providers.storyboard_generator import OpenAIStoryboardGeneratorProvider
 from app.providers.video_provider import MockVideoProvider
@@ -59,7 +60,16 @@ def get_storyboard_provider() -> OpenAIStoryboardGeneratorProvider:
 def get_video_provider_registry() -> VideoProviderRegistry:
     """Build the local provider registry for generation tasks."""
 
-    return VideoProviderRegistry(providers={"mock": MockVideoProvider()})
+    settings = get_settings()
+    return VideoProviderRegistry(
+        providers={
+            "mock": MockVideoProvider(),
+            "seedance": SeedanceProvider(
+                base_url=settings.seedance_base_url,
+                api_key=settings.seedance_api_key,
+            ),
+        }
+    )
 
 
 def get_skill_knowledge_adapter() -> FileSystemSkillKnowledgeAdapter:

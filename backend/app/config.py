@@ -19,6 +19,8 @@ class Settings:
     openai_api_key: str = ""
     openai_model: str = "gpt-5.5"
     openai_base_url: str = ""
+    seedance_api_key: str = ""
+    seedance_base_url: str = ""
 
 
 @lru_cache
@@ -42,4 +44,6 @@ def get_settings() -> Settings:
         openai_api_key=os.getenv("OPENAI_API_KEY", ""),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-5.5"),
         openai_base_url=os.getenv("OPENAI_BASE_URL", ""),
+        seedance_api_key=os.getenv("SEEDANCE_API_KEY", ""),
+        seedance_base_url=os.getenv("SEEDANCE_BASE_URL", ""),
     )

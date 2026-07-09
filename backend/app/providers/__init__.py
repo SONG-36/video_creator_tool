@@ -6,6 +6,7 @@ from app.providers.director_provider import (
     DirectorProvider,
     OpenAIDirectorProvider,
 )
+from app.providers.seedance_provider import SeedanceProvider
 from app.providers.skill_knowledge import (
     FileSystemSkillKnowledgeAdapter,
     SeedanceKnowledge,
@@ -28,6 +29,7 @@ __all__ = [
     "MockVideoProvider",
     "OpenAIStoryboardGeneratorProvider",
     "OpenAIDirectorProvider",
+    "SeedanceProvider",
     "SeedanceKnowledge",
     "SkillKnowledgeAdapter",
     "SkillKnowledgeError",
