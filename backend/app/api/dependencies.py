@@ -4,12 +4,17 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db_session
+from app.providers.director_provider import OpenAIDirectorProvider
+from app.providers.skill_knowledge import FileSystemSkillKnowledgeAdapter
 from app.providers.storyboard_generator import OpenAIStoryboardGeneratorProvider
+from app.repositories.asset import AssetRepository
 from app.repositories.project import ProjectRepository
+from app.repositories.production import ProductionRepository
 from app.repositories.script import ScriptRepository
 from app.repositories.shot import ShotRepository
 from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
+from app.services.director import AIDirectorService
 from app.services.production_type import ProductionTypeService
 from app.services.review import ShotReviewService
 from app.services.script import ScriptService
@@ -31,6 +36,20 @@ def get_storyboard_provider() -> OpenAIStoryboardGeneratorProvider:
     """Build the OpenAI storyboard generator provider."""
 
     return OpenAIStoryboardGeneratorProvider()
+
+
+def get_skill_knowledge_adapter() -> FileSystemSkillKnowledgeAdapter:
+    """Build the filesystem-backed Seedance knowledge adapter."""
+
+    return FileSystemSkillKnowledgeAdapter()
+
+
+def get_director_provider(
+    knowledge_adapter: FileSystemSkillKnowledgeAdapter = Depends(get_skill_knowledge_adapter),
+) -> OpenAIDirectorProvider:
+    """Build the OpenAI AI director provider."""
+
+    return OpenAIDirectorProvider(knowledge_adapter=knowledge_adapter)
 
 
 def get_storyboard_service(
@@ -61,4 +80,18 @@ def get_production_type_service(session: Session = Depends(get_db_session)) -> P
 
     return ProductionTypeService(
         shot_repository=ShotRepository(session),
+    )
+
+
+def get_ai_director_service(
+    session: Session = Depends(get_db_session),
+    provider: OpenAIDirectorProvider = Depends(get_director_provider),
+) -> AIDirectorService:
+    """Build the AI director service from repository dependencies."""
+
+    return AIDirectorService(
+        shot_repository=ShotRepository(session),
+        production_repository=ProductionRepository(session),
+        asset_repository=AssetRepository(session),
+        provider=provider,
     )

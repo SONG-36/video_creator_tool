@@ -100,3 +100,38 @@ class ShotProductionTypeResponse(ApiResponse):
     """Response envelope carrying a shot production selection."""
 
     data: dict[str, ShotProductionTypeData]
+
+
+class AssetRequirementData(BaseModel):
+    """Serialized asset requirement payload."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    asset_id: str
+    asset_type: str
+    role: str
+    reference_tag: str
+    requirement_note: str
+    status: str
+
+
+class ProductionPlanData(BaseModel):
+    """Serialized AI production plan payload."""
+
+    task_id: str
+    shot_id: str
+    model: str
+    generation_mode: str
+    prompt: str
+    negative_prompt: str
+    camera: str
+    motion: str
+    lighting: str
+    status: str
+    asset_requirement: list[AssetRequirementData]
+
+
+class ProductionPlanResponse(ApiResponse):
+    """Response envelope carrying an AI production plan."""
+
+    data: dict[str, ProductionPlanData]

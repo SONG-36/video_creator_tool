@@ -1,5 +1,7 @@
 """Production task repository."""
 
+from typing import Optional
+
 from sqlalchemy import select
 
 from app.models.production_task import ProductionTask
@@ -15,3 +17,12 @@ class ProductionRepository(BaseRepository[ProductionTask]):
     def list_by_shot_id(self, shot_id: str) -> list[ProductionTask]:
         statement = select(self.model).where(self.model.shot_id == shot_id)
         return list(self.session.scalars(statement).all())
+
+    def get_latest_by_shot_id(self, shot_id: str) -> Optional[ProductionTask]:
+        statement = (
+            select(self.model)
+            .where(self.model.shot_id == shot_id)
+            .order_by(self.model.created_at.desc())
+            .limit(1)
+        )
+        return self.session.scalar(statement)
