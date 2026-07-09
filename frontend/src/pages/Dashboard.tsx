@@ -2,6 +2,7 @@ import { apiConfig } from '../api/client'
 import { AppShell } from '../components/AppShell'
 import { StatCard } from '../components/StatCard'
 import { useDashboardMetrics } from '../hooks/useDashboardMetrics'
+import { Link } from 'react-router-dom'
 
 export function Dashboard() {
   const { metrics, recentProjects } = useDashboardMetrics()
@@ -91,7 +92,7 @@ export function Dashboard() {
                 当前限制
               </p>
               <p className="mt-2 text-sm text-emerald-50/88">
-                不连接后端、不渲染 Storyboard、不处理 Asset 页面。
+                本阶段只接入 Storyboard 审核页面，不处理 AI Director、Asset、Generation 页面。
               </p>
             </div>
             <div className="rounded-2xl bg-white/8 px-4 py-3">
@@ -102,6 +103,12 @@ export function Dashboard() {
                 在后续 Task 中逐步接入审核流和生产页面。
               </p>
             </div>
+            <Link
+              to="/storyboards/storyboard_demo/review"
+              className="inline-flex rounded-2xl bg-amber-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-200"
+            >
+              打开 Storyboard 审核页
+            </Link>
           </div>
         </aside>
       </section>
