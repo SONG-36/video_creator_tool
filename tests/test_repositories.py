@@ -9,6 +9,8 @@ from app.db.base import Base
 from app.models import Project, Script, Shot, Storyboard
 from app.repositories import (
     AssetRepository,
+    GenerationResultRepository,
+    GenerationReviewRepository,
     GenerationTaskRepository,
     ProductionRepository,
     ProjectRepository,
@@ -85,6 +87,8 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
     shot_repository = ShotRepository(session)
     asset_repository = AssetRepository(session)
     generation_task_repository = GenerationTaskRepository(session)
+    generation_result_repository = GenerationResultRepository(session)
+    generation_review_repository = GenerationReviewRepository(session)
     production_repository = ProductionRepository(session)
 
     shot = shot_repository.create(
@@ -122,12 +126,33 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
         result_payload=None,
         error_message="",
     )
+    generation_result = generation_result_repository.create(
+        generation_task_id=generation_task.task_id,
+        video_url="https://cdn.example.com/generated/counter.mp4",
+        video_path="storage/generated/counter.mp4",
+        thumbnail_url="https://cdn.example.com/generated/counter.jpg",
+        version=1,
+        generation_cost=0.85,
+        status="completed",
+        review_status="reviewing",
+    )
+    generation_review = generation_review_repository.create(
+        generation_result_id=generation_result.id,
+        review_status="approved",
+        comment="Video looks correct.",
+        reviewer="video_reviewer_1",
+    )
 
     shots = shot_repository.list_by_storyboard_id(storyboard.storyboard_id)
     assets = asset_repository.list_by_shot_id(shot.shot_id)
     tasks = production_repository.list_by_shot_id(shot.shot_id)
     task_assets = asset_repository.list_by_production_task_id(task.task_id)
     generation_tasks = generation_task_repository.list_by_production_task_id(task.task_id)
+    generation_results = generation_result_repository.list_by_generation_task_id(generation_task.task_id)
+    latest_generation_result = generation_result_repository.get_latest_by_generation_task_id(
+        generation_task.task_id
+    )
+    generation_reviews = generation_review_repository.list_by_generation_result_id(generation_result.id)
     updated_shot = shot_repository.update(shot.shot_id, production_type="ai_generate")
     updated_asset = asset_repository.update(asset.asset_id, status="uploaded")
     updated_task = production_repository.update(task.task_id, status="ready")
@@ -135,6 +160,15 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
         generation_task.task_id,
         status="completed",
         result_payload={"video_path": "storage/generated/mock.mp4"},
+    )
+    updated_generation_result = generation_result_repository.update(
+        generation_result.id,
+        review_status="approved",
+        generation_cost=1.15,
+    )
+    updated_generation_review = generation_review_repository.update(
+        generation_review.id,
+        comment="Video approved for publishing.",
     )
 
     assert len(shots) == 1
@@ -149,6 +183,12 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
     assert task_assets[0].role == "first_frame"
     assert len(generation_tasks) == 1
     assert generation_tasks[0].provider == "mock"
+    assert len(generation_results) == 1
+    assert generation_results[0].video_path.endswith("counter.mp4")
+    assert latest_generation_result is not None
+    assert latest_generation_result.version == 1
+    assert len(generation_reviews) == 1
+    assert generation_reviews[0].reviewer == "video_reviewer_1"
     assert updated_shot is not None
     assert updated_shot.production_type == "ai_generate"
     assert updated_asset is not None
@@ -157,5 +197,10 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
     assert updated_task.status == "ready"
     assert updated_generation_task is not None
     assert updated_generation_task.status == "completed"
+    assert updated_generation_result is not None
+    assert updated_generation_result.review_status == "approved"
+    assert updated_generation_result.generation_cost == 1.15
+    assert updated_generation_review is not None
+    assert updated_generation_review.comment == "Video approved for publishing."
 
     session.close()

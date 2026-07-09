@@ -1,6 +1,8 @@
 """Repository layer exports."""
 
 from app.repositories.asset import AssetRepository
+from app.repositories.generation_result import GenerationResultRepository
+from app.repositories.generation_review import GenerationReviewRepository
 from app.repositories.generation_task import GenerationTaskRepository
 from app.repositories.production import ProductionRepository
 from app.repositories.project import ProjectRepository
@@ -11,6 +13,8 @@ from app.repositories.storyboard import StoryboardRepository
 
 __all__ = [
     "AssetRepository",
+    "GenerationResultRepository",
+    "GenerationReviewRepository",
     "GenerationTaskRepository",
     "ProductionRepository",
     "ProjectRepository",

@@ -7,7 +7,18 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db.base import Base
 from app.db.init_db import init_database
-from app.models import Asset, GenerationTask, ProductionTask, Project, Script, Shot, ShotReview, Storyboard
+from app.models import (
+    Asset,
+    GenerationResult,
+    GenerationReview,
+    GenerationTask,
+    ProductionTask,
+    Project,
+    Script,
+    Shot,
+    ShotReview,
+    Storyboard,
+)
 
 
 def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
@@ -46,6 +57,20 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
             status="queued",
             request_payload={"prompt": "Clean the stain with steam."},
         )
+        generation_result = GenerationResult(
+            video_url="https://cdn.example.com/generated/steam-cleaner.mp4",
+            video_path="storage/generated/steam-cleaner.mp4",
+            thumbnail_url="https://cdn.example.com/generated/steam-cleaner.jpg",
+            version=1,
+            generation_cost=1.25,
+            status="completed",
+            review_status="reviewing",
+        )
+        generation_review = GenerationReview(
+            review_status="approved",
+            comment="Result is ready to publish.",
+            reviewer="reviewer_video_a",
+        )
         asset = Asset(
             asset_type="product_image",
             role="identity",
@@ -60,6 +85,8 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         shot.reviews.append(review)
         shot.production_tasks.append(task)
         task.generation_tasks.append(generation_task)
+        generation_task.generation_results.append(generation_result)
+        generation_result.reviews.append(generation_review)
         shot.assets.append(asset)
         task.assets.append(asset)
 
@@ -82,6 +109,18 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         assert saved_shot.production_tasks[0].lighting == "Soft daylight with clean highlights"
         assert saved_shot.production_tasks[0].generation_tasks[0].provider == "mock"
         assert saved_shot.production_tasks[0].generation_tasks[0].status == "queued"
+        assert saved_shot.production_tasks[0].generation_tasks[0].generation_results[0].video_path.endswith(
+            "steam-cleaner.mp4"
+        )
+        assert saved_shot.production_tasks[0].generation_tasks[0].generation_results[0].review_status == "reviewing"
+        assert (
+            saved_shot.production_tasks[0]
+            .generation_tasks[0]
+            .generation_results[0]
+            .reviews[0]
+            .reviewer
+            == "reviewer_video_a"
+        )
         assert saved_shot.assets[0].status == "pending"
         assert saved_shot.assets[0].role == "identity"
         assert saved_shot.assets[0].reference_tag == "@Image1"

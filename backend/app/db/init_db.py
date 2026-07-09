@@ -4,6 +4,8 @@ from app.db import session as db_session
 from app.db.base import Base
 from app.models import (
     Asset,
+    GenerationResult,
+    GenerationReview,
     GenerationTask,
     ProductionTask,
     Project,

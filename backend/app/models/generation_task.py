@@ -28,3 +28,7 @@ class GenerationTask(Base, IdMixin, TimestampMixin, UpdatedTimestampMixin):
     error_message: Mapped[str] = mapped_column(Text, default="")
 
     production_task: Mapped["ProductionTask"] = relationship(back_populates="generation_tasks")
+    generation_results: Mapped[list["GenerationResult"]] = relationship(
+        back_populates="generation_task",
+        cascade="all, delete-orphan",
+    )
