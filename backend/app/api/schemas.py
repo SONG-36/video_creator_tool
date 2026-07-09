@@ -52,3 +52,31 @@ class StoryboardGenerateResponse(ApiResponse):
     """Response envelope carrying generated storyboard metadata."""
 
     data: dict[str, StoryboardGenerateData]
+
+
+class ReviewShotRequest(BaseModel):
+    """Payload for reviewing a shot."""
+
+    result: str
+    comment: str = ""
+    reviewer: Optional[str] = None
+
+
+class ShotReviewData(BaseModel):
+    """Serialized shot review payload."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    review_id: str
+    shot_id: str
+    review_type: str
+    result: str
+    comment: str
+    reviewer: str
+    created_at: datetime
+
+
+class ShotReviewResponse(ApiResponse):
+    """Response envelope carrying a shot review payload."""
+
+    data: dict[str, ShotReviewData]

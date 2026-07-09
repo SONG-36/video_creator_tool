@@ -8,7 +8,9 @@ from app.providers.storyboard_generator import OpenAIStoryboardGeneratorProvider
 from app.repositories.project import ProjectRepository
 from app.repositories.script import ScriptRepository
 from app.repositories.shot import ShotRepository
+from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
+from app.services.review import ShotReviewService
 from app.services.script import ScriptService
 from app.services.storyboard import StoryboardService
 
@@ -41,4 +43,13 @@ def get_storyboard_service(
         storyboard_repository=StoryboardRepository(session),
         shot_repository=ShotRepository(session),
         provider=provider,
+    )
+
+
+def get_shot_review_service(session: Session = Depends(get_db_session)) -> ShotReviewService:
+    """Build the shot review service from repository dependencies."""
+
+    return ShotReviewService(
+        shot_repository=ShotRepository(session),
+        shot_review_repository=ShotReviewRepository(session),
     )
