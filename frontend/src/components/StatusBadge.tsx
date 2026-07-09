@@ -8,6 +8,9 @@ const STATUS_STYLES: Record<string, string> = {
   revision_required: 'bg-orange-100 text-orange-900',
   rejected: 'bg-rose-100 text-rose-900',
   pending: 'bg-slate-100 text-slate-700',
+  uploaded: 'bg-sky-100 text-sky-900',
+  ai_generate: 'bg-cyan-100 text-cyan-900',
+  real_shoot: 'bg-violet-100 text-violet-900',
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {

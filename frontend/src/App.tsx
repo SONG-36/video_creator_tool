@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom'
 import { Dashboard } from './pages/Dashboard'
+import { ProductionPage } from './pages/ProductionPage'
 import { StoryboardReviewPage } from './pages/StoryboardReviewPage'
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
         path="/storyboards/:storyboardId/review"
         element={<StoryboardReviewPage />}
       />
+      <Route path="/shots/:shotId/production" element={<ProductionPage />} />
       <Route
         path="*"
         element={

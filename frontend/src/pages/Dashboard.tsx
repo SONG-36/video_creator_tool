@@ -92,7 +92,7 @@ export function Dashboard() {
                 当前限制
               </p>
               <p className="mt-2 text-sm text-emerald-50/88">
-                本阶段只接入 Storyboard 审核页面，不处理 AI Director、Asset、Generation 页面。
+                当前前端只接入 Storyboard 审核页与 AI 生产页，不包含 Generation 页面，也不触发真实视频生成。
               </p>
             </div>
             <div className="rounded-2xl bg-white/8 px-4 py-3">
@@ -100,7 +100,7 @@ export function Dashboard() {
                 下一阶段
               </p>
               <p className="mt-2 text-sm text-emerald-50/88">
-                在后续 Task 中逐步接入审核流和生产页面。
+                在后续 Task 中继续接入视频生成任务与更完整的生产状态追踪。
               </p>
             </div>
             <Link
@@ -108,6 +108,12 @@ export function Dashboard() {
               className="inline-flex rounded-2xl bg-amber-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-amber-200"
             >
               打开 Storyboard 审核页
+            </Link>
+            <Link
+              to="/shots/shot_demo/production"
+              className="inline-flex rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-50"
+            >
+              打开 AI 生产页
             </Link>
           </div>
         </aside>
