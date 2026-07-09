@@ -13,6 +13,8 @@ from app.providers.skill_knowledge import FileSystemSkillKnowledgeAdapter
 from app.providers.storyboard_generator import OpenAIStoryboardGeneratorProvider
 from app.providers.video_provider import MockVideoProvider
 from app.repositories.asset import AssetRepository
+from app.repositories.generation_result import GenerationResultRepository
+from app.repositories.generation_review import GenerationReviewRepository
 from app.repositories.generation_task import GenerationTaskRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.production import ProductionRepository
@@ -22,6 +24,8 @@ from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
 from app.services.asset import AssetService
 from app.services.director import AIDirectorService
+from app.services.generation_result import GenerationResultService
+from app.services.generation_review import GenerationReviewService
 from app.services.generation_task import GenerationTaskService, VideoProviderRegistry
 from app.services.production_type import ProductionTypeService
 from app.services.review import ShotReviewService
@@ -139,7 +143,32 @@ def get_generation_task_service(
 
     return GenerationTaskService(
         generation_task_repository=GenerationTaskRepository(session),
+        generation_result_repository=GenerationResultRepository(session),
         production_repository=ProductionRepository(session),
         asset_repository=AssetRepository(session),
         provider_registry=provider_registry,
+    )
+
+
+def get_generation_result_service(
+    session: Session = Depends(get_db_session),
+) -> GenerationResultService:
+    """Build the generation result service from repository dependencies."""
+
+    return GenerationResultService(
+        generation_result_repository=GenerationResultRepository(session),
+    )
+
+
+def get_generation_review_service(
+    session: Session = Depends(get_db_session),
+    generation_task_service: GenerationTaskService = Depends(get_generation_task_service),
+) -> GenerationReviewService:
+    """Build the generation review service from repository and task-service dependencies."""
+
+    return GenerationReviewService(
+        generation_result_repository=GenerationResultRepository(session),
+        generation_review_repository=GenerationReviewRepository(session),
+        production_repository=ProductionRepository(session),
+        generation_task_service=generation_task_service,
     )

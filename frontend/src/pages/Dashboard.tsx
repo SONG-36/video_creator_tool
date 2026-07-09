@@ -92,7 +92,7 @@ export function Dashboard() {
                 当前限制
               </p>
               <p className="mt-2 text-sm text-emerald-50/88">
-                当前前端只接入 Storyboard 审核页与 AI 生产页，不包含 Generation 页面，也不触发真实视频生成。
+                当前前端已接入 Storyboard 审核页、AI 生产页和视频结果审核页，不触发真实视频生成。
               </p>
             </div>
             <div className="rounded-2xl bg-white/8 px-4 py-3">
@@ -114,6 +114,12 @@ export function Dashboard() {
               className="inline-flex rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-50"
             >
               打开 AI 生产页
+            </Link>
+            <Link
+              to="/generation-results/result_demo/review"
+              className="inline-flex rounded-2xl bg-emerald-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-200"
+            >
+              打开视频审核页
             </Link>
           </div>
         </aside>

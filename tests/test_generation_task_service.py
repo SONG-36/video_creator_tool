@@ -14,6 +14,7 @@ from app.models.shot import Shot
 from app.models.storyboard import Storyboard
 from app.providers.video_provider import MockVideoProvider
 from app.repositories.asset import AssetRepository
+from app.repositories.generation_result import GenerationResultRepository
 from app.repositories.generation_task import GenerationTaskRepository
 from app.repositories.production import ProductionRepository
 from app.services.generation_task import (
@@ -75,6 +76,7 @@ def create_production_task(session: Session, status: str = "ready") -> Productio
 def build_service(session: Session) -> GenerationTaskService:
     return GenerationTaskService(
         generation_task_repository=GenerationTaskRepository(session),
+        generation_result_repository=GenerationResultRepository(session),
         production_repository=ProductionRepository(session),
         asset_repository=AssetRepository(session),
         provider_registry=VideoProviderRegistry(providers={"mock": MockVideoProvider()}),
@@ -96,10 +98,16 @@ def test_ready_production_task_can_create_and_complete_generation_task(tmp_path:
 
     completed_task = service.get_generation_task(created_task.task_id)
     refreshed_production_task = ProductionRepository(session).get_by_id(production_task.task_id)
+    generation_result = GenerationResultRepository(session).get_by_generation_task_id(
+        completed_task.task_id
+    )
 
     assert completed_task.status == "completed"
     assert completed_task.result_payload is not None
     assert completed_task.result_payload["video_path"].endswith(f"{completed_task.task_id}.mp4")
+    assert generation_result is not None
+    assert generation_result.version == 1
+    assert generation_result.review_status == "reviewing"
     assert refreshed_production_task is not None
     assert refreshed_production_task.status == "completed"
 

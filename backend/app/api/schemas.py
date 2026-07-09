@@ -203,3 +203,69 @@ class GenerationTaskResponse(ApiResponse):
     """Response envelope carrying one generation task."""
 
     data: dict[str, GenerationTaskData]
+
+
+class ReviewGenerationResultRequest(BaseModel):
+    """Payload for reviewing a generated video result."""
+
+    review_status: str
+    comment: str = ""
+    reviewer: Optional[str] = None
+    regenerate: bool = False
+    prompt_override: Optional[str] = None
+
+
+class GenerationResultData(BaseModel):
+    """Serialized generation result payload."""
+
+    result_id: str
+    generation_task_id: str
+    production_task_id: str
+    shot_id: str
+    provider: str
+    prompt: str
+    negative_prompt: str
+    camera: str
+    motion: str
+    lighting: str
+    video_url: str
+    video_path: str
+    thumbnail_url: str
+    version: int
+    generation_cost: float
+    status: str
+    review_status: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class GenerationResultResponse(ApiResponse):
+    """Response envelope carrying one generation result."""
+
+    data: dict[str, GenerationResultData]
+
+
+class GenerationReviewData(BaseModel):
+    """Serialized generation review payload."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    generation_result_id: str
+    review_status: str
+    comment: str
+    reviewer: str
+    created_at: datetime
+
+
+class GenerationResultReviewData(BaseModel):
+    """Serialized response after reviewing a generation result."""
+
+    review: GenerationReviewData
+    next_generation_task: Optional[GenerationTaskData] = None
+
+
+class GenerationResultReviewResponse(ApiResponse):
+    """Response envelope carrying a generation result review action."""
+
+    data: dict[str, GenerationResultReviewData]

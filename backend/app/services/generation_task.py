@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from app.models.generation_task import GenerationTask
 from app.providers.video_provider import VideoProvider, VideoProviderError
 from app.repositories.asset import AssetRepository
+from app.repositories.generation_result import GenerationResultRepository
 from app.repositories.generation_task import GenerationTaskRepository
 from app.repositories.production import ProductionRepository
 
@@ -44,6 +45,7 @@ class GenerationTaskService:
     """Manage asynchronous video generation tasks through repositories and providers."""
 
     generation_task_repository: GenerationTaskRepository
+    generation_result_repository: GenerationResultRepository
     production_repository: ProductionRepository
     asset_repository: AssetRepository
     provider_registry: VideoProviderRegistry
@@ -109,7 +111,8 @@ class GenerationTaskService:
 
         updates = {"status": next_status}
         if next_status == "completed":
-            updates["result_payload"] = provider.get_result(generation_task)
+            provider_result = provider.get_result(generation_task)
+            updates["result_payload"] = provider_result
             updates["error_message"] = ""
         elif next_status == "failed":
             updates["error_message"] = "Video provider task failed."
@@ -119,6 +122,8 @@ class GenerationTaskService:
             raise GenerationTaskNotFoundError(f"GenerationTask {task_id} not found.")
 
         self._sync_production_status(refreshed_task)
+        if next_status == "completed":
+            self._ensure_generation_result(refreshed_task)
         return refreshed_task
 
     def _build_request_payload(self, production_task_id: str) -> dict:
@@ -157,3 +162,23 @@ class GenerationTaskService:
             self.production_repository.update(generation_task.production_task_id, status="completed")
         elif generation_task.status == "failed":
             self.production_repository.update(generation_task.production_task_id, status="failed")
+
+    def _ensure_generation_result(self, generation_task: GenerationTask) -> None:
+        existing_result = self.generation_result_repository.get_by_generation_task_id(generation_task.task_id)
+        if existing_result is not None:
+            return
+
+        payload = generation_task.result_payload or {}
+        version = self.generation_result_repository.get_next_version_for_production_task(
+            generation_task.production_task_id
+        )
+        self.generation_result_repository.create(
+            generation_task_id=generation_task.task_id,
+            video_url=payload.get("video_url", ""),
+            video_path=payload.get("video_path", ""),
+            thumbnail_url=payload.get("thumbnail_url", ""),
+            version=version,
+            generation_cost=float(payload.get("generation_cost", 0.0) or 0.0),
+            status=payload.get("status", generation_task.status),
+            review_status="reviewing",
+        )
