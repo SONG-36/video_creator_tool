@@ -25,3 +25,7 @@ class ProductionTask(Base, IdMixin, TimestampMixin):
 
     shot: Mapped["Shot"] = relationship(back_populates="production_tasks")
     assets: Mapped[list["Asset"]] = relationship(back_populates="production_task")
+    generation_tasks: Mapped[list["GenerationTask"]] = relationship(
+        back_populates="production_task",
+        cascade="all, delete-orphan",
+    )

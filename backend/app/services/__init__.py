@@ -14,6 +14,14 @@ from app.services.director import (
     ProductionPlanGenerationFailedError,
     ProductionPlanNotFoundError,
 )
+from app.services.generation_task import (
+    ALLOWED_GENERATION_STATUSES,
+    GenerationTaskCreationError,
+    GenerationTaskNotFoundError,
+    GenerationTaskService,
+    UnsupportedVideoProviderError,
+    VideoProviderRegistry,
+)
 from app.services.production_type import InvalidProductionTypeSelectionError, ProductionTypeService
 from app.services.review import InvalidShotReviewTransitionError, ShotReviewService
 from app.services.storyboard import StoryboardService, StoryboardGenerationFailedError
@@ -22,10 +30,14 @@ from app.services.script import ProjectNotFoundError, ScriptNotFoundError, Scrip
 __all__ = [
     "AIDirectorService",
     "ALLOWED_ASSET_STATUSES",
+    "ALLOWED_GENERATION_STATUSES",
     "AssetNotFoundError",
     "AssetService",
     "AssetStatusError",
     "AssetUploadError",
+    "GenerationTaskCreationError",
+    "GenerationTaskNotFoundError",
+    "GenerationTaskService",
     "InvalidProductionPlanRequestError",
     "InvalidShotReviewTransitionError",
     "InvalidProductionTypeSelectionError",
@@ -39,4 +51,6 @@ __all__ = [
     "ShotReviewService",
     "StoryboardGenerationFailedError",
     "StoryboardService",
+    "UnsupportedVideoProviderError",
+    "VideoProviderRegistry",
 ]

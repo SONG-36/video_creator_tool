@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db.base import Base
 from app.db.init_db import init_database
-from app.models import Asset, ProductionTask, Project, Script, Shot, ShotReview, Storyboard
+from app.models import Asset, GenerationTask, ProductionTask, Project, Script, Shot, ShotReview, Storyboard
 
 
 def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
@@ -41,6 +41,11 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
             motion="Steam expands across the surface",
             lighting="Soft daylight with clean highlights",
         )
+        generation_task = GenerationTask(
+            provider="mock",
+            status="queued",
+            request_payload={"prompt": "Clean the stain with steam."},
+        )
         asset = Asset(
             asset_type="product_image",
             role="identity",
@@ -54,6 +59,7 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         storyboard.shots.append(shot)
         shot.reviews.append(review)
         shot.production_tasks.append(task)
+        task.generation_tasks.append(generation_task)
         shot.assets.append(asset)
         task.assets.append(asset)
 
@@ -74,6 +80,8 @@ def test_models_can_create_save_and_load_relationships(tmp_path: Path) -> None:
         assert saved_shot.production_tasks[0].camera == "Slow push-in"
         assert saved_shot.production_tasks[0].motion == "Steam expands across the surface"
         assert saved_shot.production_tasks[0].lighting == "Soft daylight with clean highlights"
+        assert saved_shot.production_tasks[0].generation_tasks[0].provider == "mock"
+        assert saved_shot.production_tasks[0].generation_tasks[0].status == "queued"
         assert saved_shot.assets[0].status == "pending"
         assert saved_shot.assets[0].role == "identity"
         assert saved_shot.assets[0].reference_tag == "@Image1"

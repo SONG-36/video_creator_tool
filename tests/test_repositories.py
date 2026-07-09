@@ -9,6 +9,7 @@ from app.db.base import Base
 from app.models import Project, Script, Shot, Storyboard
 from app.repositories import (
     AssetRepository,
+    GenerationTaskRepository,
     ProductionRepository,
     ProjectRepository,
     ScriptRepository,
@@ -83,6 +84,7 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
 
     shot_repository = ShotRepository(session)
     asset_repository = AssetRepository(session)
+    generation_task_repository = GenerationTaskRepository(session)
     production_repository = ProductionRepository(session)
 
     shot = shot_repository.create(
@@ -112,14 +114,28 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
         requirement_note="Use as the opening frame reference",
         file_path="storage/assets/counter.png",
     )
+    generation_task = generation_task_repository.create(
+        production_task_id=task.task_id,
+        provider="mock",
+        status="queued",
+        request_payload={"prompt": "Clean the counter"},
+        result_payload=None,
+        error_message="",
+    )
 
     shots = shot_repository.list_by_storyboard_id(storyboard.storyboard_id)
     assets = asset_repository.list_by_shot_id(shot.shot_id)
     tasks = production_repository.list_by_shot_id(shot.shot_id)
     task_assets = asset_repository.list_by_production_task_id(task.task_id)
+    generation_tasks = generation_task_repository.list_by_production_task_id(task.task_id)
     updated_shot = shot_repository.update(shot.shot_id, production_type="ai_generate")
     updated_asset = asset_repository.update(asset.asset_id, status="uploaded")
     updated_task = production_repository.update(task.task_id, status="ready")
+    updated_generation_task = generation_task_repository.update(
+        generation_task.task_id,
+        status="completed",
+        result_payload={"video_path": "storage/generated/mock.mp4"},
+    )
 
     assert len(shots) == 1
     assert shots[0].scene == "Kitchen counter"
@@ -131,11 +147,15 @@ def test_shot_asset_and_production_repositories_crud(tmp_path: Path) -> None:
     assert tasks[0].camera == "Slow dolly-in"
     assert len(task_assets) == 1
     assert task_assets[0].role == "first_frame"
+    assert len(generation_tasks) == 1
+    assert generation_tasks[0].provider == "mock"
     assert updated_shot is not None
     assert updated_shot.production_type == "ai_generate"
     assert updated_asset is not None
     assert updated_asset.status == "uploaded"
     assert updated_task is not None
     assert updated_task.status == "ready"
+    assert updated_generation_task is not None
+    assert updated_generation_task.status == "completed"
 
     session.close()

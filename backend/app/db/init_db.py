@@ -2,7 +2,16 @@
 
 from app.db import session as db_session
 from app.db.base import Base
-from app.models import Asset, ProductionTask, Project, Script, Shot, ShotReview, Storyboard
+from app.models import (
+    Asset,
+    GenerationTask,
+    ProductionTask,
+    Project,
+    Script,
+    Shot,
+    ShotReview,
+    Storyboard,
+)
 
 
 def init_database() -> None:

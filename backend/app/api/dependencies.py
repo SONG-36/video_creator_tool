@@ -10,7 +10,9 @@ from app.db.session import get_db_session
 from app.providers.director_provider import OpenAIDirectorProvider
 from app.providers.skill_knowledge import FileSystemSkillKnowledgeAdapter
 from app.providers.storyboard_generator import OpenAIStoryboardGeneratorProvider
+from app.providers.video_provider import MockVideoProvider
 from app.repositories.asset import AssetRepository
+from app.repositories.generation_task import GenerationTaskRepository
 from app.repositories.project import ProjectRepository
 from app.repositories.production import ProductionRepository
 from app.repositories.script import ScriptRepository
@@ -19,6 +21,7 @@ from app.repositories.shot_review import ShotReviewRepository
 from app.repositories.storyboard import StoryboardRepository
 from app.services.asset import AssetService
 from app.services.director import AIDirectorService
+from app.services.generation_task import GenerationTaskService, VideoProviderRegistry
 from app.services.production_type import ProductionTypeService
 from app.services.review import ShotReviewService
 from app.services.script import ScriptService
@@ -51,6 +54,12 @@ def get_storyboard_provider() -> OpenAIStoryboardGeneratorProvider:
     """Build the OpenAI storyboard generator provider."""
 
     return OpenAIStoryboardGeneratorProvider()
+
+
+def get_video_provider_registry() -> VideoProviderRegistry:
+    """Build the local provider registry for generation tasks."""
+
+    return VideoProviderRegistry(providers={"mock": MockVideoProvider()})
 
 
 def get_skill_knowledge_adapter() -> FileSystemSkillKnowledgeAdapter:
@@ -109,4 +118,18 @@ def get_ai_director_service(
         production_repository=ProductionRepository(session),
         asset_repository=AssetRepository(session),
         provider=provider,
+    )
+
+
+def get_generation_task_service(
+    session: Session = Depends(get_db_session),
+    provider_registry: VideoProviderRegistry = Depends(get_video_provider_registry),
+) -> GenerationTaskService:
+    """Build the generation task service from repository dependencies."""
+
+    return GenerationTaskService(
+        generation_task_repository=GenerationTaskRepository(session),
+        production_repository=ProductionRepository(session),
+        asset_repository=AssetRepository(session),
+        provider_registry=provider_registry,
     )

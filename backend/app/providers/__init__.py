@@ -18,12 +18,14 @@ from app.providers.storyboard_generator import (
     StoryboardGenerationProvider,
     StoryboardGenerationResult,
 )
+from app.providers.video_provider import MockVideoProvider, VideoProvider, VideoProviderError
 
 __all__ = [
     "DirectorGenerationError",
     "DirectorPlanResult",
     "DirectorProvider",
     "FileSystemSkillKnowledgeAdapter",
+    "MockVideoProvider",
     "OpenAIStoryboardGeneratorProvider",
     "OpenAIDirectorProvider",
     "SeedanceKnowledge",
@@ -32,4 +34,6 @@ __all__ = [
     "StoryboardGenerationError",
     "StoryboardGenerationProvider",
     "StoryboardGenerationResult",
+    "VideoProvider",
+    "VideoProviderError",
 ]

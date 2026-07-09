@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 
 from app.api.routes.assets import router as assets_router
+from app.api.routes.generation import router as generation_router
 from app.api.routes.shots import router as shots_router
 from app.api.routes.scripts import router as scripts_router
 from app.config import get_settings
@@ -13,6 +14,7 @@ app = FastAPI(title=settings.app_name)
 app.include_router(scripts_router)
 app.include_router(shots_router)
 app.include_router(assets_router)
+app.include_router(generation_router)
 
 
 @app.get("/health")

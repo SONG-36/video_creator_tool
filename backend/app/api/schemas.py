@@ -176,3 +176,30 @@ class AssetListResponse(ApiResponse):
     """Response envelope carrying a production task asset list."""
 
     data: dict[str, AssetListData]
+
+
+class CreateGenerationTaskRequest(BaseModel):
+    """Payload for creating a generation task."""
+
+    production_task_id: str
+    provider: str = "mock"
+
+
+class GenerationTaskData(BaseModel):
+    """Serialized generation task payload."""
+
+    task_id: str
+    production_task_id: str
+    provider: str
+    status: str
+    request_payload: dict
+    result_payload: Optional[dict]
+    error_message: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class GenerationTaskResponse(ApiResponse):
+    """Response envelope carrying one generation task."""
+
+    data: dict[str, GenerationTaskData]
